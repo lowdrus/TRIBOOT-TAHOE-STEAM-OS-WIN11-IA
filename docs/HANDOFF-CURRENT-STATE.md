@@ -12,13 +12,28 @@ Antes de propor mudanças no projeto TRIBOOT, ler nesta ordem:
 2. `README.md`;
 3. `docs/ARCHITECTURE.md`;
 4. `docs/ROADMAP.md`;
-5. o handoff do subprojeto ativo, quando aplicável.
+5. o handoff do subprojeto ativo, quando aplicável;
+6. histórico/conversas anteriores do próprio projeto quando houver decisões ainda não consolidadas no repositório.
 
 Para o macOS Tahoe/LOWDRUS, consultar também:
 
 `lowdrus/AUTO-INSTALLER-TAHOE-NOTEBOOK-RAZER-BLADE-PRO-2014/docs/HANDOFF-CURRENT-STATE.md`
 
-**Não repetir testes já concluídos em subprojetos sem mudança real de hardware, artefato ou hipótese.**
+### REGRA ABSOLUTA — EVOLUÇÃO SEM DUPLICAÇÃO
+
+O TRIBOOT é **estritamente evolutivo**.
+
+Antes de criar qualquer novo componente, documento, script, instalador, módulo, menu, fluxo, partição lógica, rotina de recovery, integração de IA/voz, configuração de boot ou mecanismo de update:
+
+1. auditar o que já existe no repositório e nos subprojetos;
+2. verificar se a mesma função já foi implementada, planejada, testada ou documentada;
+3. se já existir, **evoluir, integrar, corrigir ou substituir de forma controlada o componente existente**;
+4. não criar um segundo componente equivalente em paralelo;
+5. não repetir teste concluído sem uma mudança concreta de variável, hipótese, hardware ou artefato;
+6. registrar claramente quando algo é `EXISTENTE`, `EVOLUÍDO`, `SUBSTITUÍDO`, `OBSOLETO` ou `PENDENTE`;
+7. manter uma única linha de evolução por função sempre que tecnicamente possível.
+
+**Não repetir testes já concluídos em subprojetos sem mudança real de hardware, artefato ou hipótese. Não criar duplicatas funcionais.**
 
 ## 2. Papel deste repositório
 
@@ -38,7 +53,32 @@ Este é o **projeto guarda-chuva** do Razer Blade Pro RZ09-0117 (2014). Ele não
 - proteção entre sistemas;
 - integração dos instaladores individuais.
 
-## 3. Arquitetura-alvo do TRIBOOT
+## 3. Histórico anterior do TRIBOOT que deve ser preservado
+
+O projeto já possui histórico técnico anterior, inclusive em outras conversas. O repositório não deve ser tratado como se tivesse começado no checkpoint atual.
+
+Marcos já conhecidos e que **não devem ser repetidos do zero**:
+
+- OpenCore funcional de contingência já foi alcançado e preservado em mídia externa;
+- existe baseline de EFI/OpenCore do Razer e múltiplos testes anteriores numerados;
+- o `TESTE-05` foi usado como baseline bootável;
+- houve evolução isolada de RealtekRTL8111 em `TESTE-06`, com rollback preservado;
+- o diagnóstico RTL8821CU/C820 já avançou até a constatação de dependência problemática no Tahoe e não deve ser reiniciado enquanto o Tahoe base não estiver estável;
+- Tahoe 26.7 / 25G229 já foi materializado em etapas anteriores;
+- `createinstallmedia` já chegou a 100% em teste real;
+- o instalador já chegou a bootar por OpenCore externo no Razer;
+- uma falha anterior ocorreu em verificação de `SharedSupport.dmg` / `OSISVerifyBaseSystemOperation`;
+- depois, no fluxo Builder V2/startosinstall, foi observado `com.apple.BuildInfo.preflight.error error 9`;
+- a direção consolidada é convergir para **uma única mídia LOWDRUS autocontida de boot/instalação/recovery**, evitando multiplicação desnecessária de mídias e fluxos paralelos;
+- existe objetivo de instalação/recovery remoto com prioridade para Ethernet, Wi‑Fi como fallback quando funcional, SSH/diagnóstico, logs persistentes e reconexão;
+- Netac conhecida como funcional deve permanecer contingência e não deve ser alterada durante experimentos;
+- Samsung interno não deve ser tocado em auditorias que não exijam explicitamente mudança no destino;
+- um único fator/variável deve mudar por experimento sempre que possível;
+- qualquer alteração Tahoe deve informar risco, rollback e evidência antes de ser executada.
+
+Esses itens são históricos e arquiteturais. Novas implementações devem partir deles, não recriá-los.
+
+## 4. Arquitetura-alvo do TRIBOOT
 
 Cada sistema permanece desacoplado e possui seu próprio instalador/profile/recovery, enquanto o TRIBOOT atua como orquestrador superior.
 
@@ -48,7 +88,7 @@ Responsabilidade principal no repositório LOWDRUS INSTALLER:
 
 `lowdrus/AUTO-INSTALLER-TAHOE-NOTEBOOK-RAZER-BLADE-PRO-2014`
 
-Estado atual do Tahoe deve ser lido do HANDOFF desse repositório. Em 2026-09-29, o trabalho ativo está concentrado na reconstrução canônica do `Install macOS Tahoe.app` a partir do `InstallAssistant.pkg` Apple original, com checkpoint #34B concluído e próximo #34C.
+Estado atual do Tahoe deve ser lido do HANDOFF desse repositório.
 
 ### Windows 11
 
@@ -86,7 +126,7 @@ Objetivos:
 - nunca exigir Terminal/PowerShell no fluxo normal do usuário;
 - console técnico somente em Ferramentas Avançadas.
 
-## 4. Regras de segurança globais
+## 5. Regras de segurança globais
 
 1. Nunca apagar outro sistema implicitamente.
 2. Identificar discos por múltiplos atributos; nunca apenas `diskN` ou letra.
@@ -98,8 +138,10 @@ Objetivos:
 8. Qualquer falha parcial deve bloquear promoção para `[OK]`.
 9. Logs e checkpoints precisam sobreviver a reboot e mudança de chat.
 10. O produto final deve ser GUI/one-click; comandos manuais pertencem ao desenvolvimento/contingência.
+11. Não criar duplicata funcional quando já houver componente equivalente.
+12. Antes de criar algo novo, auditar o existente e escolher evolução/integração/substituição controlada.
 
-## 5. Relação entre TRIBOOT e LOWDRUS
+## 6. Relação entre TRIBOOT e LOWDRUS
 
 O LOWDRUS INSTALLER é o subprojeto responsável pelo Tahoe. O TRIBOOT não deve copiar todos os logs técnicos do LOWDRUS; deve registrar:
 
@@ -113,7 +155,7 @@ O LOWDRUS INSTALLER é o subprojeto responsável pelo Tahoe. O TRIBOOT não deve
 
 Quando o LOWDRUS alcançar instalação Tahoe funcional ponta a ponta, o TRIBOOT deve atualizar seu estado e liberar a próxima fase de integração.
 
-## 6. Estado global atual
+## 7. Estado global atual
 
 ### Tahoe / LOWDRUS
 
@@ -126,8 +168,9 @@ Quando o LOWDRUS alcançar instalação Tahoe funcional ponta a ponta, o TRIBOOT
 - investigação levou à decisão de reconstruir canonicamente a partir do PKG Apple original;
 - distro dedicada `LOWDRUS-BUILDER` em F: está operacional;
 - ferramentas `xz`, `cpio`, `python3`, `git`, `build-essential` já instaladas;
-- checkpoint #34B concluído;
-- próximo passo: #34C.
+- #34C tentativa 1 falhou porque `bsdtar` não estava instalado;
+- #34C-R instalou `libarchive-tools` e `liblzma-dev` e entrou na etapa `[2/5] Extraindo PKG ORIGINAL...`;
+- ao verificar em outra shell, `/LOWDRUS-PKG-25G229/pkg` não apareceu, portanto a sessão/processo precisa ser reavaliada antes de qualquer nova extração. Não assumir que #34C-R concluiu.
 
 ### Windows 11
 
@@ -141,7 +184,7 @@ Quando o LOWDRUS alcançar instalação Tahoe funcional ponta a ponta, o TRIBOOT
 
 **CONCEITO definido, implementação final pendente.** Deve depender de contratos estáveis dos três instaladores, não o contrário.
 
-## 7. Itens que o TRIBOOT final deverá fazer
+## 8. Itens que o TRIBOOT final deverá fazer
 
 - inventariar hardware e discos;
 - detectar instalações existentes;
@@ -159,7 +202,7 @@ Quando o LOWDRUS alcançar instalação Tahoe funcional ponta a ponta, o TRIBOOT
 - fornecer modo offline sempre que possível;
 - integrar IA/voz apenas como camada assistiva, nunca como dependência crítica.
 
-## 8. Nomenclatura crítica de mídia
+## 9. Nomenclatura crítica de mídia
 
 Para evitar confusão herdada do desenvolvimento LOWDRUS:
 
@@ -171,7 +214,7 @@ Para evitar confusão herdada do desenvolvimento LOWDRUS:
 
 O TRIBOOT deve sempre separar **mídia física** de **bridge/adaptador reportado pelo sistema operacional**.
 
-## 9. Política de documentação daqui em diante
+## 10. Política de documentação daqui em diante
 
 Após cada marco global, atualizar este HANDOFF com:
 
@@ -180,13 +223,15 @@ Após cada marco global, atualizar este HANDOFF com:
 - decisões de arquitetura;
 - esquema de partições/boot validado;
 - checkpoints concluídos;
+- componentes existentes que foram evoluídos;
+- itens substituídos/obsoletos;
 - itens NÃO REPETIR;
 - próximo passo global.
 
 Detalhes técnicos profundos permanecem nos repositórios específicos e são referenciados daqui.
 
-## 10. Próximo passo global
+## 11. Próximo passo global
 
 **Não iniciar Windows 11, SteamOS ou o boot manager final agora.**
 
-Primeiro concluir o fluxo Tahoe/LOWDRUS até instalação funcional ponta a ponta. O próximo passo técnico imediato continua sendo o **#34C no repositório LOWDRUS**. Depois que Tahoe estiver estável, atualizar este HANDOFF e avançar para a definição final do layout de partições/boot do TRIBOOT.
+Primeiro concluir o fluxo Tahoe/LOWDRUS até instalação funcional ponta a ponta. Depois atualizar este HANDOFF e avançar evolutivamente para a definição final do layout de partições/boot do TRIBOOT, aproveitando tudo que já existir e evitando qualquer duplicação funcional.
